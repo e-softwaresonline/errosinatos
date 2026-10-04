@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Detetives do Metabolismo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f3ff;--ink:#1e1b4b;--muted:#6b6894;--card:#ffffff;--line:#e6e1fa;
+  --pri:#6d28d9;--pri2:#8b5cf6;--ok:#16a34a;--bad:#dc2626;--gold:#f59e0b;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:'Nunito',system-ui,sans-serif;color:var(--ink);min-height:100vh;
+  background:
+    radial-gradient(circle at 8% 0%,#ede9fe 0,transparent 40%),
+    radial-gradient(circle at 100% 15%,#fce7f3 0,transparent 35%),
+    radial-gradient(circle at 50% 100%,#e0f2fe 0,transparent 40%),
+    var(--bg);
+}
+h1,h2,h3{font-family:'Fredoka',sans-serif;margin:0 0 8px}
+h3{font-size:22px}
+p{line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;margin:16px 0;box-shadow:0 6px 24px -14px rgba(76,29,149,.35)}
+.muted{color:var(--muted)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--c);flex:none}
+
+/* Botões */
+.btn{font:700 15px 'Nunito',sans-serif;border:0;border-radius:12px;padding:10px 16px;cursor:pointer;background:#ede9fe;color:var(--pri);transition:transform .15s,filter .15s,box-shadow .15s}
+.btn:hover{filter:brightness(.96);transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-primary{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;box-shadow:0 10px 22px -10px #6d28d9}
+.btn-gold{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#451a03;box-shadow:0 8px 18px -10px #b45309}
+.btn.ghost{background:transparent;border:1px dashed #cfc7f0;color:var(--muted)}
+.big{font-size:19px;padding:14px 30px;border-radius:16px}
+.link{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font:600 13px 'Nunito'}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+
+/* Setup */
+.hero{text-align:center;padding:30px 10px 6px}
+.hero-emoji{font-size:64px;animation:float 3s ease-in-out infinite}
+.hero h1{font-size:clamp(34px,6vw,58px);background:linear-gradient(135deg,#6d28d9,#db2777);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:18px;color:var(--muted);max-width:640px;margin:6px auto}
+.nbtns{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px}
+.nbtn{width:56px;height:56px;border-radius:16px;font:700 22px 'Fredoka';border:2px solid var(--line);background:#faf8ff;color:var(--ink);cursor:pointer}
+.nbtn.on{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;border-color:transparent;transform:scale(1.06)}
+.names{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.nameinp{display:flex;align-items:center;gap:10px;border:2px solid var(--line);border-radius:14px;padding:6px 12px;background:#fff}
+.nameinp input{border:0;outline:0;font:700 16px 'Nunito';width:100%;padding:6px 0;color:var(--ink);background:transparent}
+.cfg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.cfg{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:#faf8ff}
+.cfg label{font-weight:700}
+.cfg input{width:70px;font:700 16px 'Nunito';border:2px solid var(--line);border-radius:10px;padding:6px;text-align:center}
+.specmode{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin:4px 0 16px}
+.smbtn{text-align:left;border:2px solid var(--line);background:#faf8ff;border-radius:14px;padding:12px 14px;cursor:pointer;font:600 14px 'Nunito';color:var(--muted)}
+.smbtn b{display:block;font:700 17px 'Fredoka';color:var(--ink);margin-bottom:2px}
+.smbtn.on{border-color:var(--pri);background:#f3edff;box-shadow:0 6px 16px -10px var(--pri)}
+.smbtn.on b::after{content:' ✓';color:var(--pri)}
+.cfg-sub{font:700 16px 'Fredoka';margin:4px 0 6px}
+.howto{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:6px}
+.how{background:#faf8ff;border-radius:14px;padding:12px 14px;border:1px solid var(--line)}
+.how b{font-family:'Fredoka';font-size:17px;display:block;margin-bottom:4px}
+
+/* Topo */
+.top{position:sticky;top:0;z-index:20;background:rgba(246,243,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.brand{font:700 20px 'Fredoka';display:flex;align-items:center;gap:8px}
+.nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cdots{display:flex;gap:5px;flex-wrap:wrap}
+.cdot{width:34px;height:34px;border-radius:10px;border:2px solid var(--line);background:#fff;font:700 14px 'Fredoka';color:var(--muted);cursor:pointer}
+.cdot.mid{border-color:#fbbf24;color:#b45309}
+.cdot.done{background:#dcfce7;border-color:#86efac;color:#15803d}
+.cdot.cur{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;border-color:transparent;transform:scale(1.1)}
+.scorebar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{display:flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--c);border-radius:999px;padding:6px 14px;font-size:15px}
+.chip .pix{font:700 16px 'Fredoka';color:var(--c)}
+.lead{animation:bounce 1.4s ease-in-out infinite;display:inline-block}
+
+/* Caso */
+.casecard{background:linear-gradient(135deg,#4c1d95,#7c3aed 55%,#db2777);color:#fff;border:0;padding:26px 28px}
+.case-tag{display:inline-block;background:rgba(255,255,255,.18);border-radius:999px;padding:4px 14px;font:700 13px 'Nunito';letter-spacing:.08em}
+.casecard h2{font-size:clamp(26px,4vw,40px);margin:10px 0 6px}
+.age{font:600 18px 'Nunito';opacity:.95}
+.intro{font-size:20px;max-width:900px;margin:10px 0 0}
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+.step{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--muted);font-weight:700}
+.step span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#ede9fe;color:var(--pri);font-size:13px}
+.step.now{background:var(--pri);color:#fff;border-color:transparent}
+.step.now span{background:#fff}
+.step.past{color:var(--ok)}
+.step.past span{background:#dcfce7;color:var(--ok)}
+
+/* Tabela de pistas */
+.tablewrap{overflow-x:auto;margin-top:10px;border-radius:14px;border:1px solid var(--line)}
+table.ht{border-collapse:collapse;width:100%;min-width:860px;background:#fff}
+.ht th,.ht td{padding:8px 6px;text-align:center;border-bottom:1px solid var(--line)}
+.ht thead th{background:#faf8ff;vertical-align:bottom}
+.ht tr:last-child td{border-bottom:0}
+.hh{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12.5px;font-weight:700;line-height:1.15}
+.he{font-size:24px}
+.cost{margin-top:3px;background:#ede9fe;color:var(--pri);border-radius:999px;padding:2px 8px;font-size:12px}
+.cost.mid{background:#fef3c7;color:#b45309}
+.cost.high{background:#fee2e2;color:#b91c1c}
+.ht .tn{text-align:left;position:sticky;left:0;background:#fff;min-width:150px;z-index:1}
+.tn-in{display:flex;align-items:center;gap:8px;font-weight:800}
+.tn small{display:block;color:var(--muted);font-weight:600;margin-left:20px}
+.hb{width:46px;height:46px;border-radius:14px;border:2px dashed #d4cdf3;background:#faf8ff;font:700 20px 'Fredoka';color:#fff;cursor:pointer;transition:.15s}
+.hb:hover{border-color:var(--c)}
+.hb.on{background:var(--c);border:2px solid var(--c);transform:scale(1.08);box-shadow:0 6px 14px -6px var(--c)}
+.tot{font:700 18px 'Fredoka';color:var(--bad);min-width:90px}
+.tot small{display:block;font:600 12px 'Nunito';color:var(--muted)}
+
+/* Caso completo */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.tab{border:2px solid var(--c);background:#fff;color:var(--ink);border-radius:12px;padding:8px 14px;font:700 15px 'Nunito';cursor:pointer}
+.tab small{background:#f1eefc;border-radius:999px;padding:1px 7px;margin-left:4px;font-size:12px}
+.tab.on{background:var(--c);color:#fff}
+.tab.on small{background:rgba(255,255,255,.25)}
+.casefull{border:3px solid var(--c);border-radius:18px;padding:18px;background:#fff;scroll-margin-top:110px}
+.cf-head{display:flex;align-items:center;gap:8px;font-size:20px;font-family:'Fredoka'}
+.cf-intro{font-size:17px;background:#faf8ff;border-radius:12px;padding:12px 14px;margin:12px 0}
+.clues{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.clue{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#fff;animation:pop .35s ease both}
+.clue-h{display:flex;align-items:center;gap:8px;font:700 17px 'Fredoka';margin-bottom:6px}
+.clue-h span{font-size:24px}
+.clue ul{margin:0;padding-left:20px}
+.clue li{margin:4px 0;font-size:16px}
+.empty{padding:16px;text-align:center;color:var(--muted);font-weight:700;background:#faf8ff;border-radius:12px}
+.specbox{margin-top:12px;border-radius:14px;padding:14px 16px;background:linear-gradient(135deg,#ecfeff,#f0fdf4);border:2px solid #5eead4;animation:pop .35s ease both}
+.specbox p{margin:0;font-size:17px}
+
+/* Respostas */
+.arows{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.arow{display:grid;grid-template-columns:190px 1fr auto;gap:10px;align-items:center;border-left:6px solid var(--c);background:#faf8ff;border-radius:12px;padding:10px 12px}
+.an{display:flex;align-items:center;gap:8px;font-weight:800}
+.an small{color:var(--muted);font-weight:600;margin-left:auto}
+.ain{font:600 17px 'Nunito';border:2px solid var(--line);border-radius:12px;padding:10px 12px;width:100%;outline:none;background:#fff;color:var(--ink)}
+.ain:focus{border-color:var(--c)}
+.spec{background:#ccfbf1;color:#0f766e;white-space:nowrap}
+.spec small{opacity:.8}
+.spec.done{background:#0d9488;color:#fff}
+
+/* Resultados */
+.reveal{text-align:center;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:2px solid #fcd34d;animation:pop .45s ease both}
+.dx-label{font:700 14px 'Nunito';letter-spacing:.1em;color:#b45309;text-transform:uppercase}
+.dx{font:700 clamp(26px,4vw,40px) 'Fredoka';margin:6px 0}
+.reveal p{max-width:820px;margin:6px auto 0;font-size:17px}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.res{border-radius:16px;padding:14px;border:3px solid var(--c);background:#fff;text-align:center;animation:pop .45s ease both}
+.res.ok{background:linear-gradient(180deg,#f0fdf4,#fff)}
+.res.bad{background:linear-gradient(180deg,#fef2f2,#fff)}
+.res-top{display:flex;align-items:center;justify-content:center;gap:8px;font-size:17px}
+.res-icon{font-size:48px;margin:6px 0}
+.res-msg{font:700 20px 'Fredoka'}
+.res.ok .res-msg{color:var(--ok)}
+.res.bad .res-msg{color:var(--bad)}
+.res-ans{margin:6px 0;color:var(--muted);font-size:15px;word-break:break-word}
+.res-foot{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);margin-top:8px}
+
+/* Pódio */
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:12px;padding-top:20px;flex-wrap:nowrap}
+.pod{width:min(200px,30vw);display:flex;flex-direction:column;align-items:center}
+.pod-top{text-align:center;margin-bottom:8px}
+.trophy{font-size:54px;animation:bounce 1.4s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(180,83,9,.35))}
+.pod-name{font:700 18px 'Fredoka';word-break:break-word}
+.pod-pix{font:700 22px 'Fredoka';color:var(--c)}
+.pod-hits{font-size:13px;color:var(--muted)}
+.pod-base{width:100%;border-radius:14px 14px 4px 4px;background:var(--c);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:10px;box-shadow:inset 0 -10px 0 rgba(0,0,0,.12)}
+.pod-base span{font-size:30px}
+.pod-base b{font:700 24px 'Fredoka'}
+.r1 .pod-base{height:150px}
+.r2 .pod-base{height:110px}
+.r3 .pod-base{height:80px}
+.rest{max-width:560px;margin:16px auto 0;display:flex;flex-direction:column;gap:6px}
+.rrow{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:12px;background:#faf8ff;border-left:5px solid var(--c)}
+.rname{flex:1;font-weight:700}
+
+/* Final */
+.champ{text-align:center;padding:30px 10px 0}
+.confetti{font-size:34px;letter-spacing:6px}
+.big-trophy{font-size:120px;animation:bounce 1.6s ease-in-out infinite;filter:drop-shadow(0 12px 14px rgba(180,83,9,.35))}
+.champ h1{font-size:clamp(36px,6vw,60px);color:#b45309}
+.champ-name{display:inline-block;background:var(--c);color:#fff;font:700 28px 'Fredoka';padding:6px 22px;border-radius:999px;margin:4px}
+.champ-pix{font:700 24px 'Fredoka';color:var(--muted);margin-top:8px}
+
+/* Modal e toast */
+.overlay{position:fixed;inset:0;background:rgba(30,27,75,.55);z-index:50;display:grid;place-items:center;padding:16px;animation:fade .2s}
+.modal{background:#fff;border-radius:24px;padding:24px;width:min(760px,100%);max-height:92vh;overflow:auto;position:relative;animation:pop .3s ease both}
+.modal h2{text-align:center}
+.x{position:absolute;top:12px;right:12px;border:0;background:#f1eefc;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,40px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:14px;font-weight:700;opacity:0;transition:.3s;z-index:60;pointer-events:none;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.foot{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:26px 0 40px}
+
+@keyframes pop{from{opacity:0;transform:scale(.92) translateY(8px)}to{opacity:1;transform:none}}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-8px) rotate(4deg)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+@media (max-width:720px){
+  .arow{grid-template-columns:1fr}
+  .intro{font-size:17px}
+  .casecard{padding:20px}
+  .brand span{display:none}
+  .pod-name{font-size:15px}
+  .trophy{font-size:40px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============ CONFIGURAÇÃO ============ */
+const HINTS = [
+  {k:'nasc', e:'👶', n:'Dados do nascimento', c:3},
+  {k:'mat',  e:'🤰', n:'História materna', c:3},
+  {k:'alim', e:'💕', n:'Alimentação', c:4},
+  {k:'gi',   e:'🤢', n:'Sintomas gastrointestinais', c:8},
+  {k:'ger',  e:'❤️', n:'Sinais e sintomas gerais', c:5},
+  {k:'fam',  e:'👨‍👩‍👧', n:'História familiar', c:5},
+  {k:'lab',  e:'🧪', n:'Exames laboratoriais', c:12},
+  {k:'inv',  e:'🔬', n:'Investigação metabólica', c:16},
+];
+const COLORS = ['#ef4444','#3b82f6','#16a34a','#f59e0b','#a855f7','#ec4899','#0d9488'];
+const DEFAULT_NAMES = ['Equipe Vermelha','Equipe Azul','Equipe Verde','Equipe Laranja','Equipe Roxa','Equipe Rosa','Equipe Turquesa'];
+
+/* ============ CASOS ============ */
+const CASES = [
+{
+  title:"O bebê que começou a ficar diferente",
+  age:"Recém-nascido, 8 dias de vida",
+  intro:"Nasceu a termo, aparentemente saudável, mas nos últimos dias os pais perceberam que o bebê estava diferente. Inicialmente, os sintomas foram considerados pouco específicos.",
+  clues:{
+    nasc:["39 semanas de gestação","Peso: 3.250 g","Apgar 9/10","Parto vaginal","Não precisou de UTI","Alta hospitalar após 48 horas"],
+    mat:["Mãe, 27 anos, primeira gestação","Pré-natal adequado","Sem infecções ou complicações importantes","Não utilizou medicamentos durante a gestação","Gestação sem intercorrências"],
+    alim:["Aleitamento materno exclusivo desde o nascimento","Mamava adequadamente nos primeiros dias","A partir do 5º dia, passou a apresentar dificuldade para mamar","Atualmente mama em menor quantidade"],
+    gi:["Episódios ocasionais de vômitos","Sem diarreia","Leve dificuldade de ganho de peso"],
+    ger:["Irritabilidade","Sonolência excessiva","Hipotonia","Responde pouco aos estímulos","Episódios de choro sem causa aparente"],
+    fam:["Pais não apresentam doenças conhecidas","Sem histórico de doenças metabólicas conhecido","Um primo distante apresentou atraso do desenvolvimento"],
+    lab:["Glicemia normal","Eletrólitos normais","Função hepática sem alterações importantes","Dosagem de aminoácidos plasmáticos mostrou aumento importante de fenilalanina"],
+    inv:["Triagem neonatal apresentou alteração compatível com hiperfenilalaninemia","Exame confirmatório mostrou deficiência na conversão da fenilalanina em tirosina"]
+  },
+  spec:"Pensem em um aminoácido aromático essencial que deveria ser convertido em tirosina. Quando ele se acumula, é tóxico para o sistema nervoso central — e essa doença é procurada no teste do pezinho.",
+  dx:"Fenilcetonúria (PKU)",
+  note:"Deficiência na conversão da fenilalanina em tirosina (fenilalanina hidroxilase). O acúmulo de fenilalanina leva a manifestações neurológicas. É uma das doenças rastreadas na triagem neonatal.",
+  accept:["fenilcetonuria","fenilceto","pku","hiperfenilalaninemia"]
+},
+{
+  title:"O recém-nascido que não tolerava a alimentação",
+  age:"Recém-nascido, 6 dias de vida",
+  intro:"Após alguns dias aparentemente normais, começou a apresentar alterações progressivas após o início da alimentação.",
+  clues:{
+    nasc:["38 semanas","Peso: 3.100 g","Apgar 8/9","Parto cesáreo","Sem necessidade de cuidados intensivos"],
+    mat:["Mãe de 30 anos","Segunda gestação","Pré-natal adequado","Sem diabetes ou hipertensão","Sem exposição conhecida a medicamentos de risco"],
+    alim:["Aleitamento materno inicialmente bem tolerado","Após alguns dias, passou a apresentar dificuldade para mamar","Recusa parcial das mamadas","Piora após as refeições"],
+    gi:["Vômitos frequentes","Recusa alimentar","Perda de peso","Episódios de desidratação"],
+    ger:["Letargia","Hipotonia","Irritabilidade alternada com sonolência","Evoluiu com alteração do nível de consciência"],
+    fam:["Pais aparentemente saudáveis","Relatam parentesco distante entre as famílias","Uma criança da família morreu ainda no primeiro mês de vida por causa não esclarecida"],
+    lab:["Acidose metabólica","Presença de cetonas","Alteração importante dos aminoácidos plasmáticos","Aumento de aminoácidos de cadeia ramificada"],
+    inv:["Exame metabólico revelou elevação de leucina, isoleucina e valina","Investigação enzimática demonstrou alteração no complexo responsável pelo metabolismo desses aminoácidos"]
+  },
+  spec:"O problema envolve os aminoácidos de cadeia ramificada. Um detalhe clássico: a urina e o suor desses bebês têm um odor adocicado, lembrando calda de panqueca.",
+  dx:"Leucinose / Doença da urina do xarope de bordo (MSUD)",
+  note:"Defeito no complexo enzimático que metaboliza os α-cetoácidos de cadeia ramificada, com acúmulo de leucina, isoleucina e valina. Causa cetoacidose, encefalopatia e odor adocicado característico.",
+  accept:["leucinose","xarope de bordo","xarope do bordo","bordo","msud","maple"]
+},
+{
+  title:"O bebê com alterações hepáticas",
+  age:"Lactente, 3 meses de vida",
+  intro:"Desde o nascimento, apresentava desenvolvimento aparentemente normal, mas começou a apresentar dificuldade para ganhar peso e alterações progressivas.",
+  clues:{
+    nasc:["39 semanas","Peso ao nascer: 3.400 g","Apgar 9/9","Parto sem intercorrências","Alta com a mãe após 48 horas"],
+    mat:["Mãe de 24 anos","Gestação sem complicações","Pré-natal adequado","Sem uso de medicamentos relevantes"],
+    alim:["Aleitamento materno exclusivo inicialmente","Posteriormente iniciou fórmula infantil","Apresenta dificuldade para manter alimentação adequada","Ganho ponderal insuficiente"],
+    gi:["Vômitos recorrentes","Episódios de diarreia","Redução do apetite","Baixo ganho de peso"],
+    ger:["Irritabilidade","Fraqueza","Hepatomegalia","Progressivamente mais sonolento"],
+    fam:["Pais saudáveis","Sem doenças metabólicas diagnosticadas na família","Há relato de uma criança que morreu ainda pequena por doença hepática de causa desconhecida"],
+    lab:["Aumento importante das transaminases","Alterações da função hepática","Alterações da coagulação","Distúrbios metabólicos associados"],
+    inv:["Exame metabólico demonstrou aumento de tirosina","Investigação revelou alteração no metabolismo da tirosina","Exame enzimático/genético confirmou defeito em uma etapa da degradação desse aminoácido"]
+  },
+  spec:"O fígado é o órgão mais atingido. O defeito está na degradação de um aminoácido que o próprio organismo produz a partir da fenilalanina.",
+  dx:"Tirosinemia",
+  note:"Alteração do metabolismo da tirosina por defeito em uma etapa da sua degradação. Associa-se a manifestações hepáticas importantes, coagulopatia e possibilidade de evolução grave.",
+  accept:["tirosinemia","tirosinose"]
+},
+{
+  title:"O bebê que piorava depois das mamadas",
+  age:"Recém-nascido, 10 dias de vida",
+  intro:"Após alguns dias de vida aparentemente normais, começou a apresentar vômitos, alteração do estado geral e dificuldade para se alimentar.",
+  clues:{
+    nasc:["40 semanas","Peso: 3.050 g","Apgar 9/9","Parto vaginal","Sem necessidade de UTI"],
+    mat:["Mãe de 29 anos","Gestação sem intercorrências","Pré-natal adequado","Sem infecções importantes"],
+    alim:["Aleitamento materno inicialmente","Nas últimas 48 horas, passou a recusar as mamadas","Apresenta piora dos sintomas após alimentação"],
+    gi:["Vômitos repetidos","Distensão abdominal","Recusa alimentar","Episódios de desidratação"],
+    ger:["Letargia","Hipotonia","Irritabilidade","Evolução para alteração do nível de consciência"],
+    fam:["Pais saudáveis","Consanguinidade não relatada","Sem diagnóstico metabólico prévio na família"],
+    lab:["Acidose metabólica","Aumento do ânion gap","Cetonemia/cetonúria","Alterações dos ácidos orgânicos urinários"],
+    inv:["Cromatografia urinária demonstrou aumento de metabólitos orgânicos","Identificado padrão compatível com alteração do metabolismo de aminoácidos","Investigação confirmou uma acidemia orgânica"]
+  },
+  spec:"Acidose com ânion gap aumentado e cetose em um neonato que piora com a alimentação: pensem no acúmulo de ácidos carboxílicos gerados no catabolismo de aminoácidos — a resposta pode ser dada como uma categoria de doenças.",
+  dx:"Acidemia orgânica",
+  note:"Grupo de doenças em que ácidos orgânicos derivados do catabolismo de aminoácidos se acumulam (ex.: acidemias propiônica, metilmalônica e isovalérica). Causam acidose metabólica, cetose e manifestações neurológicas.",
+  accept:["acidemia","aciduria","acido organico","acidos organicos","propionica","metilmalonica","isovalerica"]
+},
+{
+  title:"O bebê sonolento com um exame inesperado",
+  age:"Recém-nascido, 12 dias de vida",
+  intro:"Era aparentemente saudável até começar a apresentar episódios de sonolência e recusa alimentar.",
+  clues:{
+    nasc:["39 semanas","Peso: 3.200 g","Apgar 9/10","Parto normal","Sem necessidade de UTI"],
+    mat:["Mãe de 26 anos","Gestação sem complicações","Pré-natal adequado","Sem exposição a substâncias ou medicamentos relevantes"],
+    alim:["Aleitamento materno exclusivo","Inicialmente mamava bem","Evoluiu com recusa alimentar e dificuldade de sucção"],
+    gi:["Vômitos ocasionais","Sem diarreia","Perda de peso discreta"],
+    ger:["Sonolência intensa","Hipotonia","Irritabilidade","Episódios de alteração da consciência","Sem febre ou sinais claros de infecção"],
+    fam:["Pais saudáveis","Um irmão mais velho morreu no período neonatal após episódio descrito como “infecção grave”, sem diagnóstico definido"],
+    lab:["Amônia plasmática muito elevada","Glicemia relativamente preservada","Acidose metabólica ausente ou discreta","Alteração dos aminoácidos plasmáticos"],
+    inv:["Investigação demonstrou alteração na eliminação do nitrogênio","Exames mostraram alteração em metabólitos relacionados ao ciclo da ureia","Teste enzimático confirmou deficiência de uma enzima do ciclo"]
+  },
+  spec:"Hiperamonemia grave, quase sem acidose: a via hepática que transforma o nitrogênio tóxico em algo eliminável pela urina está falhando. Esses bebês muitas vezes são confundidos com sepse.",
+  dx:"Distúrbio do ciclo da ureia",
+  note:"Deficiência de uma das enzimas do ciclo da ureia, responsável por converter amônia em ureia no fígado. A hiperamonemia é a manifestação central e causa encefalopatia.",
+  accept:["ciclo da ureia","ciclo de ureia","ureia","otc","ornitina transcarbamilase","ornitina transcarbamoilase","citrulinemia","argininosuccin","carbamoil","carbamil"]
+},
+{
+  title:"A criança que passava mal quando ficava sem comer",
+  age:"Lactente, 9 meses de vida",
+  intro:"A criança apresentava crescimento aparentemente adequado, mas os pais perceberam que episódios de jejum eram acompanhados por sintomas importantes.",
+  clues:{
+    nasc:["39 semanas","Peso ao nascer: 3.350 g","Apgar 9/9","Sem complicações neonatais"],
+    mat:["Gestação normal","Pré-natal adequado","Sem doenças maternas relevantes"],
+    alim:["Aleitamento materno até 6 meses","Introdução alimentar sem grandes dificuldades","Apresenta piora dos sintomas quando passa muitas horas sem comer"],
+    gi:["Vômitos durante os episódios","Recusa alimentar após as crises","Dificuldade para recuperar o peso após episódios mais intensos"],
+    ger:["Episódios de fraqueza","Sudorese","Tremores","Sonolência","Em uma ocasião, apresentou alteração de consciência"],
+    fam:["Sem histórico conhecido de doenças metabólicas","Um primo apresentou episódios semelhantes durante a infância"],
+    lab:["Durante uma crise: hipoglicemia","Aumento de lactato","Alterações metabólicas","Hepatomegalia observada ao exame físico"],
+    inv:["Investigação mostrou deficiência relacionada ao armazenamento/utilização do glicogênio","Exame enzimático confirmou alteração em uma enzima relacionada ao metabolismo do glicogênio"]
+  },
+  spec:"Hipoglicemia de jejum + fígado grande + lactato alto: o problema está na reserva de glicose que o fígado deveria liberar entre as refeições.",
+  dx:"Glicogenose",
+  note:"Defeito no armazenamento ou na utilização do glicogênio (ex.: tipo I, doença de von Gierke). Manifesta-se com hipoglicemia de jejum, hepatomegalia e aumento de lactato.",
+  accept:["glicogenose","glicogenio","gierke","pompe","mcardle","cori"]
+},
+{
+  title:"O bebê que piorou após a fórmula",
+  age:"Recém-nascido, 7 dias de vida",
+  intro:"Nasceu aparentemente saudável, mas apresentou rápida piora após o início da alimentação.",
+  clues:{
+    nasc:["39 semanas","Peso: 3.180 g","Apgar 9/9","Parto vaginal","Sem necessidade de UTI"],
+    mat:["Mãe de 25 anos","Gestação sem intercorrências","Pré-natal adequado","Sem diabetes gestacional"],
+    alim:["Aleitamento materno nos primeiros dias","Necessitou complementar a alimentação com fórmula infantil","Após o início da fórmula, apresentou piora importante dos sintomas","Passou a recusar as mamadas"],
+    gi:["Vômitos","Diarreia","Distensão abdominal","Dificuldade para ganhar peso"],
+    ger:["Irritabilidade","Letargia","Fraqueza","Evoluiu com sinais de comprometimento sistêmico"],
+    fam:["Pais saudáveis","Sem histórico conhecido de doenças metabólicas","Sem irmãos prévios"],
+    lab:["Hipoglicemia","Alterações da função hepática","Alteração de eletrólitos","Presença de substâncias redutoras na urina"],
+    inv:["Triagem metabólica mostrou alteração no metabolismo da galactose","Identificada deficiência da enzima galactose-1-fosfato uridiltransferase (GALT)"]
+  },
+  spec:"Substâncias redutoras na urina e piora com leite: um dos açúcares que compõem a lactose não está sendo metabolizado.",
+  dx:"Galactosemia",
+  note:"Deficiência de galactose-1-fosfato uridiltransferase (GALT): a galactose do leite se acumula, causando vômitos, hipoglicemia, disfunção hepática e substâncias redutoras na urina.",
+  accept:["galactosemia","galt"]
+},
+{
+  title:"A criança que não gostava de frutas",
+  age:"Lactente, 10 meses de vida",
+  intro:"Até então apresentava desenvolvimento razoável, mas os pais começaram a perceber uma relação curiosa entre alguns alimentos e os sintomas.",
+  clues:{
+    nasc:["40 semanas","Peso: 3.400 g","Apgar 9/9","Sem intercorrências neonatais"],
+    mat:["Gestação normal","Pré-natal adequado","Sem doenças maternas relevantes"],
+    alim:["Aleitamento materno até 6 meses","Após a introdução alimentar, apresentou rejeição de alguns alimentos","Os pais perceberam que a criança recusava especialmente preparações com sabor muito doce","Sintomas apareciam após determinados alimentos"],
+    gi:["Vômitos após algumas refeições","Dor/distensão abdominal","Diarreia ocasional","Recusa alimentar"],
+    ger:["Irritabilidade após as refeições","Sonolência","Sudorese","Baixo ganho ponderal"],
+    fam:["Pais saudáveis","Sem diagnóstico metabólico prévio","Uma irmã mais velha apresentou dificuldades alimentares na infância, mas atualmente é saudável"],
+    lab:["Episódios de hipoglicemia","Alterações das enzimas hepáticas","Alterações metabólicas após ingestão de determinados alimentos"],
+    inv:["Investigação demonstrou alteração na utilização da frutose","Identificada deficiência relacionada à frutose-1-fosfato aldolase","Os sintomas eram desencadeados pela ingestão de frutose"]
+  },
+  spec:"A aversão a doces é um mecanismo de autoproteção da criança: o gatilho é o açúcar presente nas frutas e na sacarose.",
+  dx:"Frutosemia / Intolerância hereditária à frutose",
+  note:"Deficiência da frutose-1-fosfato aldolase (aldolase B). A ingestão de frutose provoca vômitos, hipoglicemia e alterações hepáticas.",
+  accept:["frutosemia","frutose","fructose"]
+},
+{
+  title:"O menino que começou a mudar na escola",
+  age:"Menino, 7 anos",
+  intro:"Era considerado saudável até aproximadamente um ano atrás, quando os pais começaram a perceber mudanças progressivas no comportamento e no desempenho escolar.",
+  clues:{
+    nasc:["Nascido a termo","Peso adequado","Apgar 9/9","Desenvolvimento neuropsicomotor normal durante os primeiros anos","Sem internações importantes"],
+    mat:["Gestação sem intercorrências","Pré-natal adequado","Sem exposição a medicamentos relevantes","Desenvolvimento inicial considerado normal"],
+    alim:["Aleitamento materno","Introdução alimentar normal","Alimentação atual variada","Sem história de intolerâncias alimentares relevantes"],
+    gi:["Sem vômitos ou diarreia recorrentes","Sem dificuldade importante para ganhar peso","Apetite relativamente preservado"],
+    ger:["Queda progressiva no rendimento escolar","Mudança de comportamento","Irritabilidade","Dificuldade de concentração","Alterações neurológicas progressivas","Posteriormente apresentou dificuldade motora"],
+    fam:["Um tio materno apresentou doença neurológica progressiva e faleceu jovem","Não havia diagnóstico claro na época","Não há história semelhante entre as mulheres da família"],
+    lab:["Exames metabólicos convencionais pouco esclarecedores","Perfil lipídico sem alterações relevantes","Investigação neurológica mostrou alterações compatíveis com doença progressiva da substância branca"],
+    inv:["Exame específico demonstrou aumento de ácidos graxos de cadeia muito longa","Investigação genética identificou alteração no gene relacionado ao transporte desses ácidos graxos","O quadro foi associado a alteração da substância branca e progressão neurológica"]
+  },
+  spec:"Herança ligada ao X (meninos afetados, mães portadoras), substância branca cerebral e um defeito peroxissomal com acúmulo de ácidos graxos de cadeia muito longa. As adrenais também podem ser atingidas.",
+  dx:"Adrenoleucodistrofia ligada ao X",
+  note:"Alteração no gene que transporta ácidos graxos de cadeia muito longa para o peroxissomo. O acúmulo desses ácidos graxos leva a desmielinização progressiva da substância branca e insuficiência adrenal.",
+  accept:["adrenoleucodistrofia","adreno leucodistrofia","adrenoleuco","ald","xald","x ald"]
+},
+{
+  title:"A criança que parecia apenas ter um problema de visão",
+  age:"Criança, 6 anos",
+  intro:"Até os primeiros anos de vida, apresentava desenvolvimento relativamente adequado. Nos últimos dois anos, entretanto, a família começou a perceber algumas alterações que inicialmente pareciam não ter relação entre si.",
+  clues:{
+    nasc:["Nascida a termo","Peso adequado para a idade gestacional","Apgar 9/9","Parto sem intercorrências","Sem necessidade de internação neonatal"],
+    mat:["Mãe de 28 anos","Segunda gestação","Pré-natal adequado","Sem intercorrências importantes","Não houve diagnóstico de doença metabólica durante a gestação"],
+    alim:["Aleitamento materno durante os primeiros meses","Introdução alimentar sem dificuldades importantes","Alimentação atualmente variada","Sem história de intolerâncias alimentares"],
+    gi:["Sem vômitos ou diarreia recorrentes","Apetite preservado","Ganho de peso discretamente abaixo do esperado nos últimos anos"],
+    ger:["Dificuldade progressiva de aprendizagem","Alterações comportamentais","Fraqueza muscular","Apresenta alterações na visão","Ao exame físico, chama atenção a estatura elevada e alterações esqueléticas","Evoluiu com atraso no desenvolvimento motor"],
+    fam:["Pais saudáveis","Há relato de um primo com atraso do desenvolvimento e problemas de visão","Não há diagnóstico metabólico conhecido na família","Pais não sabem informar a causa do quadro do primo"],
+    lab:["Hemograma sem alterações significativas","Glicemia normal","Função hepática preservada","Dosagem de aminoácidos mostrou aumento importante de homocisteína","Metionina também apresentou alteração"],
+    inv:["Investigação metabólica identificou alteração na via de conversão da homocisteína","Atividade reduzida da cistationina β-sintase (CBS)","Exame confirmou deficiência relacionada ao metabolismo da homocisteína"]
+  },
+  spec:"Aspecto parecido com o da síndrome de Marfan (alta, membros longos), luxação do cristalino e acúmulo de um aminoácido sulfurado: o defeito está na via que deveria transformar esse aminoácido em cistationina.",
+  dx:"Homocistinúria clássica",
+  note:"Deficiência da cistationina β-sintase (CBS), com acúmulo de homocisteína e metionina. Associa-se a deficiência intelectual, ectopia do cristalino, estatura elevada, alterações esqueléticas e risco de trombose.",
+  accept:["homocistinuria","homocisteinuria","homocistin","homocisteinemia","cbs","cistationina"]
+}
+];
+
+/* ============ ESTADO ============ */
+const KEY = 'detetives-metabolismo-v1';
+const A = (n,f) => Array.from({length:n}, f);
+let S = null;
+try { S = JSON.parse(localStorage.getItem(KEY)); } catch(e) {}
+if (S && (!S.teams || !S.cs)) S = null;
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} }
+
+let setup = {
+  n:4, names:DEFAULT_NAMES.slice(),
+  cfg:{start:100, reward:25, spec:20, specMode:'material', costs:Object.fromEntries(HINTS.map(h=>[h.k,h.c]))}
+};
+let modal = false;
+
+const $app = document.getElementById('app');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cur = () => S.cs[S.ci];
+const cost = k => S.cfg.costs[k];
+const selSum = (st,t) => st.sel[t].reduce((a,k)=>a+cost(k),0);
+function blankCase(n){
+  return {phase:'hints', sel:A(n,()=>[]), bought:A(n,()=>[]), spec:A(n,()=>false),
+          ans:A(n,()=>''), ok:A(n,()=>null), spent:A(n,()=>0), earned:A(n,()=>0), tab:0};
+}
+const norm = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+function isMatch(answer, accept){
+  const x = ' ' + norm(answer) + ' ';
+  if (!x.trim()) return false;
+  return accept.some(k => { const n = norm(k); return n.length <= 4 ? x.includes(' '+n+' ') : x.includes(n); });
+}
+function ranking(){
+  const arr = S.teams.map((t,i)=>({...t,i})).sort((a,b)=>b.pix-a.pix);
+  let r = 0;
+  arr.forEach((t,j)=>{ if (j===0 || t.pix < arr[j-1].pix) r = j+1; t.rank = r; });
+  return arr;
+}
+const hits = i => S.cs.filter(c => c.phase==='result' && c.ok[i]).length;
+const costClass = c => c >= 12 ? 'high' : c >= 8 ? 'mid' : '';
+
+function toast(m){
+  let el = document.getElementById('toast');
+  if (!el){ el = document.createElement('div'); el.id='toast'; document.body.appendChild(el); }
+  el.textContent = m; el.className = 'show';
+  clearTimeout(toast._t); toast._t = setTimeout(()=>el.className='', 2600);
+}
+
+/* ============ TELAS ============ */
+function viewSetup(){
+  const c = setup.cfg;
+  return `<div class="wrap">
+    <div class="hero">
+      <div class="hero-emoji">🧬🔍</div>
+      <h1>Detetives do Metabolismo</h1>
+      <p>10 casos clínicos de erros inatos do metabolismo. Comprem pistas, consultem especialistas e cheguem ao diagnóstico!</p>
+    </div>
+
+    <div class="card">
+      <h3>📜 Como jogar</h3>
+      <div class="howto">
+        <div class="how"><b>1. Introdução</b>Cada caso começa só com a apresentação do paciente.</div>
+        <div class="how"><b>2. Pistas</b>Cada equipe escolhe as pistas na plaquinha. Pistas custam pix.</div>
+        <div class="how"><b>3. Caso completo</b>Ao enviar, cada equipe vê apenas as pistas que comprou.</div>
+        <div class="how"><b>4. Especialista</b>Antes de responder, a equipe pode pagar caro para consultar o material ou outra equipe.</div>
+        <div class="how"><b>5. Diagnóstico</b>Quem acerta ganha pix. O pódio mostra quem está na frente!</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>👥 Quantas equipes?</h3>
+      <div class="nbtns">${[1,2,3,4,5,6,7].map(n=>`<button class="nbtn ${setup.n===n?'on':''}" data-a="setN" data-v="${n}">${n}</button>`).join('')}</div>
+      <div class="names">${A(setup.n,(_,i)=>`<div class="nameinp" style="--c:${COLORS[i]}"><span class="dot"></span><input data-name="${i}" value="${esc(setup.names[i])}" maxlength="24"></div>`).join('')}</div>
+    </div>
+
+    <div class="card">
+      <h3>💰 Valores (pix)</h3>
+      <p class="muted">Já vem balanceado: com ${c.start} pix e pistas simples de 3 a 5 pix, toda equipe consegue comprar pistas simples nos 10 casos, mesmo sem acertar nenhum.</p>
+      <div class="cfg-sub">🩺 Consulta ao especialista</div>
+      <div class="specmode">
+        <button class="smbtn ${c.specMode!=='equipe'?'on':''}" data-a="setSpec" data-v="material"><b>📚 Ao material</b>O jogo mostra uma dica do especialista para a equipe.</button>
+        <button class="smbtn ${c.specMode==='equipe'?'on':''}" data-a="setSpec" data-v="equipe"><b>🙋 A uma equipe</b>Não aparece dica: os próprios alunos se ajudam na sala.</button>
+      </div>
+      <div class="cfg-grid">
+        <div class="cfg"><label>💎 Pix inicial</label><input type="number" min="0" data-cfg="start" value="${c.start}"></div>
+        <div class="cfg"><label>✅ Prêmio por acerto</label><input type="number" min="0" data-cfg="reward" value="${c.reward}"></div>
+        <div class="cfg"><label>🩺 Consultar especialista</label><input type="number" min="0" data-cfg="spec" value="${c.spec}"></div>
+        ${HINTS.map(h=>`<div class="cfg"><label>${h.e} ${h.n}</label><input type="number" min="0" data-cost="${h.k}" value="${c.costs[h.k]}"></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="actions">
+      ${S ? `<button class="btn big" data-a="resume">↩ Continuar jogo atual</button>` : ''}
+      <button class="btn btn-primary big" data-a="start">${S ? 'Começar novo jogo ▶' : 'Começar o jogo ▶'}</button>
+    </div>
+  </div>`;
+}
+
+function clueHTML(C,k){
+  const h = HINTS.find(x=>x.k===k);
+  return `<div class="clue"><div class="clue-h"><span>${h.e}</span>${h.n}</div><ul>${C.clues[k].map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`;
+}
+
+function viewHints(C,st){
+  return `<div class="card">
+    <h3>🃏 Pistas escolhidas por cada equipe</h3>
+    <p class="muted">Clique nas pistas que cada equipe escreveu na plaquinha. Mais de uma equipe pode escolher a mesma pista.</p>
+    <div class="tablewrap"><table class="ht">
+      <thead><tr><th class="tn">Equipe</th>${HINTS.map(h=>`<th><div class="hh"><span class="he">${h.e}</span><span>${h.n}</span><span class="cost ${costClass(cost(h.k))}">${cost(h.k)} pix</span></div></th>`).join('')}<th>Total</th></tr></thead>
+      <tbody>${S.teams.map((t,i)=>{
+        const sum = selSum(st,i);
+        return `<tr><td class="tn"><div class="tn-in" style="--c:${t.color}"><span class="dot"></span>${esc(t.name)}</div><small>${t.pix} pix</small></td>
+          ${HINTS.map(h=>{const on = st.sel[i].includes(h.k); return `<td><button class="hb ${on?'on':''}" style="--c:${t.color}" data-a="toggle" data-t="${i}" data-k="${h.k}" title="${h.n}">${on?'✓':''}</button></td>`;}).join('')}
+          <td class="tot">${sum?'−'+sum:'0'}<small>sobra ${t.pix-sum}</small></td></tr>`;
+      }).join('')}</tbody>
+    </table></div>
+    <div class="actions"><button class="btn btn-primary big" data-a="sendHints">📨 Enviar pistas</button></div>
+  </div>`;
+}
+
+function viewCaseFull(C,st){
+  const t = Math.min(st.tab, S.teams.length-1), team = S.teams[t], b = st.bought[t];
+  return `<div class="card">
+    <h3>📋 Caso completo de cada equipe</h3>
+    <div class="tabs">${S.teams.map((x,i)=>`<button class="tab ${i===t?'on':''}" style="--c:${x.color}" data-a="tab" data-t="${i}">${esc(x.name)}<small>${st.bought[i].length}${st.spec[i]?' + 🩺':''}</small></button>`).join('')}</div>
+    <div id="casefull" class="casefull" style="--c:${team.color}">
+      <div class="cf-head"><span class="dot"></span><b>${esc(team.name)}</b><span class="muted" style="font-family:Nunito;font-size:15px">· ${b.length} pista${b.length===1?'':'s'} comprada${b.length===1?'':'s'}</span></div>
+      <p class="cf-intro"><b>${esc(C.age)}.</b> ${esc(C.intro)}</p>
+      ${b.length ? `<div class="clues">${b.map(k=>clueHTML(C,k)).join('')}</div>` : `<div class="empty">Esta equipe não comprou pistas neste caso — só tem a introdução! 😬</div>`}
+      ${!st.spec[t] ? '' : S.cfg.specMode==='equipe'
+        ? `<div class="specbox"><div class="clue-h"><span>🙋</span>Especialista consultado</div><p>Esta equipe pediu ajuda a outra equipe da sala.</p></div>`
+        : `<div class="specbox"><div class="clue-h"><span>🩺</span>Parecer do especialista</div><p>${esc(C.spec)}</p></div>`}
+    </div>
+  </div>`;
+}
+
+function viewAnswers(C,st){
+  return `<div class="card">
+    <h3>✍️ Respostas das equipes</h3>
+    <p class="muted">Digite o diagnóstico de cada equipe. Antes de enviar, a equipe pode consultar o especialista (${S.cfg.spec} pix).</p>
+    <div class="arows">${S.teams.map((t,i)=>`<div class="arow" style="--c:${t.color}">
+      <div class="an"><span class="dot"></span>${esc(t.name)}<small>${t.pix} pix</small></div>
+      <input class="ain" data-ans="${i}" value="${esc(st.ans[i])}" placeholder="Diagnóstico da ${esc(t.name)}…" autocomplete="off">
+      ${st.spec[i]
+        ? `<button class="btn spec done" data-a="tab" data-t="${i}">🩺 Especialista consultado</button>`
+        : `<button class="btn spec" data-a="consult" data-t="${i}" ${t.pix<S.cfg.spec?'disabled':''}>🩺 Consultar especialista <small>−${S.cfg.spec} pix</small></button>`}
+    </div>`).join('')}</div>
+    <div class="actions"><button class="btn btn-primary big" data-a="sendAnswers">📨 Enviar respostas</button></div>
+  </div>`;
+}
+
+function podiumHTML(){
+  const R = ranking(), top = R.slice(0,3);
+  const order = top.length===1 ? [top[0]] : top.length===2 ? [top[1],top[0]] : [top[1],top[0],top[2]];
+  const medal = ['','🥇','🥈','🥉'];
+  const pods = order.map(t=>{
+    const r = Math.min(t.rank,3), h = hits(t.i);
+    return `<div class="pod r${r}" style="--c:${t.color}">
+      <div class="pod-top">${t.rank===1?'<div class="trophy">🏆</div>':''}
+        <div class="pod-name">${esc(t.name)}</div><div class="pod-pix">${t.pix} pix</div>
+        <div class="pod-hits">${h} acerto${h===1?'':'s'}</div></div>
+      <div class="pod-base"><span>${medal[r]}</span><b>${t.rank}º</b></div></div>`;
+  }).join('');
+  const rest = R.slice(3).map(t=>{const h=hits(t.i); return `<div class="rrow" style="--c:${t.color}"><b>${t.rank}º</b><span class="dot"></span><span class="rname">${esc(t.name)}</span><span class="muted">${h} acerto${h===1?'':'s'}</span><b>${t.pix} pix</b></div>`;}).join('');
+  return `<div class="podium">${pods}</div>${rest?`<div class="rest">${rest}</div>`:''}`;
+}
+
+function viewResults(C,st){
+  return `<div class="card reveal"><div class="dx-label">🎯 Diagnóstico</div><div class="dx">${esc(C.dx)}</div><p>${esc(C.note)}</p></div>
+  <div class="card">
+    <h3>📣 Resultado das equipes</h3>
+    <div class="rgrid">${S.teams.map((t,i)=>{
+      const ok = st.ok[i];
+      return `<div class="res ${ok?'ok':'bad'}" style="--c:${t.color};animation-delay:${i*90}ms">
+        <div class="res-top"><span class="dot"></span><b>${esc(t.name)}</b></div>
+        <div class="res-icon">${ok?'✅':'❌'}</div>
+        <div class="res-msg">${ok?`Acertou! +${st.earned[i]} pix`:'Não foi dessa vez'}</div>
+        <div class="res-ans">${st.ans[i].trim()?'“'+esc(st.ans[i])+'”':'<i>sem resposta</i>'}</div>
+        <div class="res-foot"><span>Gastou ${st.spent[i]} pix · Saldo <b>${t.pix} pix</b></span>
+          <button class="link" data-a="override" data-t="${i}">${ok?'corrigir: marcar como errado':'corrigir: marcar como certo'}</button></div>
+      </div>`;
+    }).join('')}</div>
+  </div>
+  <div class="card"><h3>🏆 Pódio</h3>${podiumHTML()}</div>
+  <div class="actions">${S.ci<CASES.length-1
+    ? `<button class="btn btn-primary big" data-a="next">Próximo caso ▶</button>`
+    : `<button class="btn btn-primary big" data-a="finish">🏁 Ver resultado final</button>`}</div>`;
+}
+
+function viewGame(){
+  const C = CASES[S.ci], st = cur(), n = S.teams.length;
+  const R = ranking(), lead = R[0].pix, allTie = R.every(t=>t.pix===lead);
+  const chips = S.teams.map(t=>`<div class="chip" style="--c:${t.color}"><span class="dot"></span><b>${esc(t.name)}</b><span class="pix">${t.pix} pix</span>${(!allTie||n===1)&&t.pix===lead?'<span class="lead">🏆</span>':''}</div>`).join('');
+  const dots = CASES.map((c,i)=>{const p=S.cs[i].phase; return `<button class="cdot ${p==='result'?'done':p==='answer'?'mid':''} ${i===S.ci?'cur':''}" data-a="go" data-v="${i}" title="${esc(c.title)}">${i+1}</button>`;}).join('');
+  const stepIdx = ['hints','answer','result'].indexOf(st.phase);
+  const steps = ['Escolher pistas','Responder','Resultado'].map((s,i)=>`<div class="step ${i<stepIdx?'past':''} ${i===stepIdx?'now':''}"><span>${i<stepIdx?'✓':i+1}</span>${s}</div>`).join('');
+
+  let body = '';
+  if (st.phase==='hints') body = viewHints(C,st);
+  else if (st.phase==='answer') body = viewCaseFull(C,st) + viewAnswers(C,st);
+  else body = viewResults(C,st) + viewCaseFull(C,st);
+
+  return `<header class="top"><div class="top-in">
+      <div class="brand"><button class="btn" data-a="home" title="Voltar ao início">🏠 Início</button>🧬 <span>Detetives do Metabolismo</span></div>
+      <div class="nav">
+        <button class="btn" data-a="prev" ${S.ci===0?'disabled':''}>◀</button>
+        <div class="cdots">${dots}</div>
+        <button class="btn" data-a="next" ${S.ci===CASES.length-1?'disabled':''}>▶</button>
+      </div>
+      <button class="btn btn-gold" data-a="podium">🏆 Placar</button>
+    </div></header>
+    <div class="wrap">
+      <div class="scorebar">${chips}</div>
+      <section class="card casecard">
+        <div class="case-tag">CASO ${S.ci+1} DE ${CASES.length}</div>
+        <h2>${esc(C.title)}</h2>
+        <div class="age">🩺 ${esc(C.age)}</div>
+        <p class="intro">${esc(C.intro)}</p>
+      </section>
+      <div class="steps">${steps}</div>
+      ${body}
+      <div class="foot">
+        <button class="btn ghost" data-a="resetCase">↺ Reiniciar este caso</button>
+        ${S.ci===CASES.length-1 && st.phase!=='result' ? '' : ''}
+        <button class="btn ghost" data-a="finish">🏁 Encerrar jogo</button>
+        <button class="btn ghost" data-a="newGame">🗑 Novo jogo</button>
+      </div>
+    </div>`;
+}
+
+function viewFinal(){
+  const R = ranking(), champs = R.filter(t=>t.rank===1);
+  return `<div class="wrap">
+    <div class="champ">
+      <div class="confetti">🎉 🎊 🧬 🎊 🎉</div>
+      <div class="big-trophy">🏆</div>
+      <h1>${champs.length>1?'Empate no topo!':'Campeã!'}</h1>
+      <div>${champs.map(t=>`<span class="champ-name" style="--c:${t.color}">${esc(t.name)}</span>`).join(' ')}</div>
+      <div class="champ-pix">${R[0].pix} pix</div>
+    </div>
+    <div class="card"><h3>🏆 Pódio final</h3>${podiumHTML()}</div>
+    <div class="actions">
+      <button class="btn" data-a="home">🏠 Início</button>
+      <button class="btn" data-a="back">◀ Voltar aos casos</button>
+      <button class="btn btn-primary" data-a="newGame">Novo jogo</button>
+    </div>
+  </div>`;
+}
+
+function render(){
+  let html = (!S || S.screen==='home') ? viewSetup() : S.screen==='final' ? viewFinal() : viewGame();
+  if (modal && S && S.screen!=='home') html += `<div class="overlay" data-a="close"><div class="modal" data-a="noop"><button class="x" data-a="close">✕</button><h2>🏆 Placar geral</h2>${podiumHTML()}</div></div>`;
+  $app.innerHTML = html;
+}
+
+/* ============ AÇÕES ============ */
+const ACT = {
+  noop(){},
+  setSpec(b){ setup.cfg.specMode = b.dataset.v; render(); },
+  setN(b){ setup.n = +b.dataset.v; render(); },
+  start(){
+    if (S && !confirm('Começar um novo jogo? O jogo atual (pontuação e casos) será apagado.')) return;
+    const n = setup.n, cfg = JSON.parse(JSON.stringify(setup.cfg));
+    S = { cfg, ci:0, screen:'game',
+          teams: A(n,(_,i)=>({name:(setup.names[i]||'').trim()||DEFAULT_NAMES[i], color:COLORS[i], pix:cfg.start})),
+          cs: CASES.map(()=>blankCase(n)) };
+    save(); render(); scrollTo(0,0);
+  },
+  toggle(b){
+    const t = +b.dataset.t, k = b.dataset.k, st = cur();
+    if (st.phase!=='hints') return;
+    const s = st.sel[t], idx = s.indexOf(k);
+    if (idx>=0) s.splice(idx,1);
+    else {
+      if (selSum(st,t)+cost(k) > S.teams[t].pix) return toast(`💸 ${S.teams[t].name} não tem pix suficiente para essa pista!`);
+      s.push(k);
+    }
+    save(); render();
+  },
+  sendHints(){
+    const st = cur();
+    const none = st.sel.every(s=>!s.length);
+    if (!confirm(none ? 'Nenhuma equipe escolheu pistas. Enviar mesmo assim?' : 'Enviar as pistas e revelar o caso de cada equipe?')) return;
+    S.teams.forEach((t,i)=>{
+      const c = selSum(st,i);
+      t.pix -= c; st.spent[i] += c;
+      st.bought[i] = HINTS.map(h=>h.k).filter(k=>st.sel[i].includes(k));
+    });
+    st.phase = 'answer'; st.tab = 0;
+    save(); render(); toast('Pistas reveladas! 🔍');
+  },
+  tab(b){
+    cur().tab = +b.dataset.t; save(); render();
+    document.getElementById('casefull')?.scrollIntoView({behavior:'smooth', block:'start'});
+  },
+  consult(b){
+    const t = +b.dataset.t, st = cur(), team = S.teams[t];
+    if (st.phase!=='answer' || st.spec[t]) return;
+    if (team.pix < S.cfg.spec) return toast(`💸 ${team.name} não tem pix suficiente para o especialista.`);
+    if (!confirm(`${team.name} vai consultar o especialista por ${S.cfg.spec} pix. Confirmar?`)) return;
+    team.pix -= S.cfg.spec; st.spent[t] += S.cfg.spec; st.spec[t] = true; st.tab = t;
+    save(); render();
+    if (S.cfg.specMode==='equipe') { toast(`🙋 ${team.name} pode pedir ajuda a uma equipe agora!`); return; }
+    toast(`🩺 ${team.name} consultou o especialista!`);
+    document.getElementById('casefull')?.scrollIntoView({behavior:'smooth', block:'start'});
+  },
+  sendAnswers(){
+    const st = cur(); if (st.phase!=='answer') return;
+    document.querySelectorAll('[data-ans]').forEach(el=>st.ans[+el.dataset.ans] = el.value);
+    const empty = st.ans.filter(a=>!a.trim()).length;
+    if (!confirm(empty ? `${empty} equipe(s) sem resposta. Enviar mesmo assim?` : 'Enviar as respostas e revelar o resultado?')) return;
+    const C = CASES[S.ci];
+    S.teams.forEach((t,i)=>{
+      const ok = isMatch(st.ans[i], C.accept);
+      st.ok[i] = ok;
+      if (ok){ t.pix += S.cfg.reward; st.earned[i] = S.cfg.reward; }
+    });
+    st.phase = 'result';
+    save(); render(); scrollTo({top:0, behavior:'smooth'});
+    const n = st.ok.filter(Boolean).length;
+    toast(n ? `🎉 ${n} equipe${n>1?'s acertaram':' acertou'}!` : 'Ninguém acertou dessa vez 😅');
+  },
+  override(b){
+    const t = +b.dataset.t, st = cur(); if (st.phase!=='result') return;
+    if (!st.ok[t]){ st.ok[t] = true; S.teams[t].pix += S.cfg.reward; st.earned[t] = S.cfg.reward; }
+    else { st.ok[t] = false; S.teams[t].pix -= st.earned[t]; st.earned[t] = 0; }
+    save(); render();
+  },
+  go(b){ S.ci = +b.dataset.v; save(); render(); scrollTo({top:0, behavior:'smooth'}); },
+  prev(){ if (S.ci>0) ACT.go({dataset:{v:S.ci-1}}); },
+  next(){ if (S.ci<CASES.length-1) ACT.go({dataset:{v:S.ci+1}}); },
+  finish(){ if (S.cs.some(c=>c.phase!=='result') && !confirm('Ainda há casos sem resultado. Ver o resultado final mesmo assim?')) return; S.screen='final'; save(); render(); scrollTo(0,0); },
+  home(){
+    setup.n = S.teams.length;
+    S.teams.forEach((t,i)=>{ setup.names[i] = t.name; });
+    setup.cfg = JSON.parse(JSON.stringify(S.cfg));
+    modal = false; S.screen = 'home'; save(); render(); scrollTo(0,0);
+  },
+  resume(){ S.screen = 'game'; save(); render(); scrollTo(0,0); },
+  back(){ S.screen='game'; save(); render(); },
+  podium(){ modal = true; render(); },
+  close(){ modal = false; render(); },
+  resetCase(){
+    if (!confirm('Reiniciar este caso? Os pix gastos e ganhos nele serão devolvidos/retirados.')) return;
+    const st = cur();
+    S.teams.forEach((t,i)=>{ t.pix += st.spent[i] - st.earned[i]; });
+    S.cs[S.ci] = blankCase(S.teams.length);
+    save(); render(); toast('Caso reiniciado ↺');
+  },
+  newGame(){
+    if (!confirm('Apagar o jogo atual e começar um novo?')) return;
+    S = null; modal = false; setup.names = DEFAULT_NAMES.slice();
+    try { localStorage.removeItem(KEY); } catch(e) {}
+    render(); scrollTo(0,0);
+  }
+};
+
+document.addEventListener('click', e=>{
+  const b = e.target.closest('[data-a]');
+  if (!b || b.disabled) return;
+  const f = ACT[b.dataset.a];
+  if (f){ if (b.dataset.a!=='noop') e.stopPropagation(); f(b); }
+});
+document.addEventListener('input', e=>{
+  const el = e.target, d = el.dataset;
+  if (d.ans!==undefined && S){ cur().ans[+d.ans] = el.value; save(); }
+  else if (d.name!==undefined){ setup.names[+d.name] = el.value; }
+  else if (d.cfg){ setup.cfg[d.cfg] = Math.max(0, parseInt(el.value)||0); }
+  else if (d.cost){ setup.cfg.costs[d.cost] = Math.max(0, parseInt(el.value)||0); }
+});
+document.addEventListener('keydown', e=>{
+  if (e.key==='Escape' && modal){ modal=false; render(); }
+  if (e.key==='Enter' && e.target.dataset && e.target.dataset.ans!==undefined){
+    const nx = document.querySelector(`[data-ans="${+e.target.dataset.ans+1}"]`);
+    nx ? nx.focus() : e.target.blur();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
